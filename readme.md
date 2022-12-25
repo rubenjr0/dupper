@@ -28,4 +28,4 @@ reccursively, and the optional depth argument specifies how deep it should scan.
 # License
 
 This tool is made available under
-[GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
+[GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
