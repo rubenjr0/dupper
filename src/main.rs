@@ -52,7 +52,13 @@ async fn get_dups(path: PathBuf, reccursion_mode: &ReccursionMode, sender: Sende
         let Some(dir) = dirs_queue.write().await.pop_front() else {
             break;
         };
-        let mut entries = read_dir(&dir.path).await.expect("Failed to read dir");
+        let mut entries = match read_dir(&dir.path).await {
+            Ok(entries) => entries,
+            Err(error) => {
+                eprintln!("Failed to read dir {}: {}", dir.path.display(), error);
+                continue;
+            }
+        };
         while let Ok(Some(entry)) = entries.next_entry().await {
             let path = entry.path();
             let metadata = entry.metadata().await.expect("Failed to get metadata");
@@ -60,7 +66,7 @@ async fn get_dups(path: PathBuf, reccursion_mode: &ReccursionMode, sender: Sende
                 let sender = sender.clone();
                 let handle = tokio::spawn(async move {
                     let file = File::new(&path).await;
-                    sender.send(file).await.unwrap();
+                    sender.send(file).await.expect("Could not process file");
                 });
                 tasks.push(handle);
             } else if reccursion_mode.is_reccursive() && metadata.is_dir() {
