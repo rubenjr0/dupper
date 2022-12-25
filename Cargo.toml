@@ -2,7 +2,7 @@
 name = "dupper"
 version = "0.1.0"
 edition = "2021"
-author = "rubenjr0"
+authors = ["Rubén <rubenjr0@protonmail.com>"]
 license = "GPL-3.0-or-later"
 description = "CLI tool to find duplicate files based on their hashes."
 readme = "readme.md"
