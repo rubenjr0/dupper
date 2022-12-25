@@ -1,5 +1,9 @@
 # Dupper
 
+![Crates.io](https://img.shields.io/crates/v/dupper?style=for-the-badge)
+![Crates.io](https://img.shields.io/crates/l/dupper?style=for-the-badge)
+![GitHub Repo stars](https://img.shields.io/github/stars/rubenjr0/dupper?style=for-the-badge)
+
 Dupper is a CLI tool that helps you identify duplicate files based on their
 hashes (using the [Blake3](https://crates.io/crates/blake3) hashing algorithm).
 
@@ -23,10 +27,5 @@ reccursively, and the optional depth argument specifies how deep it should scan.
 
 # License
 
-This tool is made available under two different licenses. You may choose which
-of these licenses you wish to use the code under.
-
-- GNU General Public License version 3 (GPLv3):
-  <https://www.gnu.org/licenses/gpl-3.0.html>
-
-- Mozilla Public License (MPL): <https://www.mozilla.org/en-US/MPL/>
+This tool is made available under
+[GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
