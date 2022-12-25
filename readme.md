@@ -3,6 +3,14 @@
 Dupper is a CLI tool that helps you identify duplicate files based on their
 hashes (using the [Blake3](https://crates.io/crates/blake3) hashing algorithm).
 
+## Installation
+
+You can install dupper by using cargo:
+
+```bash
+$ cargo install dupper
+```
+
 ## Usage
 
 ```bash
