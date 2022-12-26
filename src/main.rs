@@ -5,10 +5,10 @@ use std::{
     sync::Arc,
 };
 
-use blake3::Hash;
 use clap::{command, Arg, Command};
 use eyre::Result;
 use futures::future::join_all;
+use seahash::hash;
 use tokio::{
     fs::{read, read_dir},
     sync::{
@@ -20,14 +20,13 @@ use tokio::{
 #[derive(Debug)]
 struct File {
     path: PathBuf,
-    hash: Hash,
+    size: u64,
 }
 impl File {
-    async fn new(path: &PathBuf) -> Self {
-        let hash = blake3::hash(&read(path).await.expect("Failed to read file"));
+    async fn new(path: &PathBuf, size: u64) -> Self {
         Self {
             path: path.to_path_buf(),
-            hash,
+            size,
         }
     }
 }
@@ -38,7 +37,7 @@ struct Dir {
     depth: u8,
 }
 
-async fn get_dups(path: PathBuf, reccursion_mode: &ReccursionMode, sender: Sender<File>) {
+async fn get_candidates(path: PathBuf, reccursion_mode: &ReccursionMode, sender: Sender<File>) {
     let dir = Dir {
         path,
         depth: reccursion_mode.depth(),
@@ -65,7 +64,7 @@ async fn get_dups(path: PathBuf, reccursion_mode: &ReccursionMode, sender: Sende
             if metadata.is_file() && metadata.len() > 0 {
                 let sender = sender.clone();
                 let handle = tokio::spawn(async move {
-                    let file = File::new(&path).await;
+                    let file = File::new(&path, metadata.len()).await;
                     sender.send(file).await.expect("Could not process file");
                 });
                 tasks.push(handle);
@@ -158,12 +157,21 @@ async fn main() -> Result<()> {
 
     let (sender, mut receiver) = channel::<File>(4096 * 4096);
 
-    get_dups(dir, &reccursion, sender).await;
-    let mut dups = HashMap::new();
-    while let Some(File { path, hash }) = receiver.recv().await {
-        dups.entry(hash).or_insert_with(Vec::new).push(path);
+    get_candidates(dir, &reccursion, sender).await;
+    let mut candidates = HashMap::new();
+    while let Some(File { path, size }) = receiver.recv().await {
+        candidates.entry(size).or_insert_with(Vec::new).push(path);
     }
-    dups.retain(|_, v| v.len() > 1);
+    candidates.retain(|_, v| v.len() > 1);
+
+    let mut dups = HashMap::new();
+    for (_, paths) in candidates {
+        for path in paths {
+            let content = read(&path).await?;
+            let hash = hash(&content);
+            dups.entry(hash).or_insert_with(Vec::new).push(path);
+        }
+    }
 
     if dups.len() == 0 {
         println!("No dups found");
