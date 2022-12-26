@@ -1,3 +1,5 @@
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
+
 # Dupper
 
 ![Crates.io](https://img.shields.io/crates/v/dupper?style=for-the-badge)
