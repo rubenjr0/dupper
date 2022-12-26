@@ -155,7 +155,7 @@ async fn main() -> Result<()> {
         _ => ReccursionMode::None,
     };
 
-    let (sender, mut receiver) = channel::<File>(4096 * 4096);
+    let (sender, mut receiver) = channel::<File>(u16::MAX as usize);
 
     get_candidates(dir, &reccursion, sender).await;
     let mut candidates = HashMap::new();
