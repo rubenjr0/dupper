@@ -5,7 +5,8 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/rubenjr0/dupper?style=for-the-badge)
 
 Dupper is a CLI tool that helps you identify duplicate files based on their
-hashes (using the [Blake3](https://crates.io/crates/blake3) hashing algorithm).
+hashes (using the [Seahash](https://crates.io/crates/seahash) hashing
+algorithm).
 
 ## Installation
 
