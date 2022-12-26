@@ -3,6 +3,7 @@ use std::{
     path::PathBuf,
     str::FromStr,
     sync::Arc,
+    time::Instant,
 };
 
 use clap::{command, Arg, Command};
@@ -157,6 +158,7 @@ async fn main() -> Result<()> {
 
     let (sender, mut receiver) = channel::<File>(u16::MAX as usize);
 
+    let t = Instant::now();
     get_candidates(dir, &reccursion, sender).await;
     let mut candidates = HashMap::new();
     while let Some(File { path, size }) = receiver.recv().await {
@@ -172,14 +174,17 @@ async fn main() -> Result<()> {
             dups.entry(hash).or_insert_with(Vec::new).push(path);
         }
     }
+    dups.retain(|_, paths| paths.len() > 1);
+    let t = t.elapsed();
 
     if dups.len() == 0 {
         println!("No dups found");
     } else {
-        dups.iter().filter(|(_, p)| p.len() > 1).for_each(|(_, p)| {
-            p.iter().for_each(|p| println!("{}", p.display()));
+        dups.iter().for_each(|(_, paths)| {
+            paths.iter().for_each(|path| println!("{}", path.display()));
             println!();
         });
+        println!("Found {} dups in {:?}", dups.len(), t);
     }
 
     Ok(())
